@@ -1810,7 +1810,7 @@ def main(argc,argv):
 		print('')
 
 
-if __name__ == "__main__":
+def _main():
 	try:
 		print('')
 		print('Miranda v1.3')
@@ -1818,8 +1818,10 @@ if __name__ == "__main__":
 		print('Craig Heffner, https://twitter.com/devttys0')
 		# http://web.archive.org/web/20210614114556/www.devttys0.com/
 		print('')
-		main(len(sys.argv),sys.argv)
+		return main(len(sys.argv),sys.argv)
 	except Exception as e:
 		print('Caught main exception:',e)
 		sys.exit(1)
 
+if __name__ == "__main__":
+	_main()
