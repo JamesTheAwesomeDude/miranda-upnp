@@ -527,7 +527,7 @@ class upnp:
 			try:
 				xmlRoot = minidom.parseString(xmlData)
 				self.parseDeviceInfo(xmlRoot,index)
-				self.ENUM_HOSTS[index]['serverType'] = xmlHeaders.getheader('Server')
+				self.ENUM_HOSTS[index]['serverType'] = xmlHeaders.get('Server')
 				self.ENUM_HOSTS[index]['dataComplete'] = True
 				return True
 			except Exception as e:
