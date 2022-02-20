@@ -454,15 +454,15 @@ class upnp:
 				if not data:
 					break
 				else:
-					soapResponse += data
+					soapResponse += data.decode()
 					if self.soapEnd.search(soapResponse.lower()) != None:
 						break
 			sock.close()
 	
-			(header,body) = soapResponse.split(b'\r\n\r\n',1)
+			(header,body) = soapResponse.encode().split(b'\r\n\r\n',1)
 			if not header.decode().upper().startswith('HTTP/1.') and ' 200 ' in header.split(b'\r\n')[0].decode():
-				print('SOAP request failed with error code:',header.split(b'\r\n')[0].split(' ',1)[1])
-				errorMsg = self.extractSingleTag(body,'errorDescription')
+				print('SOAP request failed with error code:',header.split(b'\r\n')[0].decode().split(' ',1)[1])
+				errorMsg = self.extractSingleTag(body.decode(),'errorDescription')
 				if errorMsg:
 					print('SOAP error message:',errorMsg)
 				return False
@@ -1235,7 +1235,7 @@ def host(argc,argv,hp):
 				if soapResponse != False:
 					#It's easier to just parse this ourselves...
 					for (tag,dataType) in retTags:
-						tagValue = hp.extractSingleTag(soapResponse,tag)
+						tagValue = hp.extractSingleTag(soapResponse.decode(),tag)
 						if dataType == 'bin.base64' and tagValue != None:
 							tagValue = base64.decodestring(tagValue)
 						print(tag,':',tagValue)
@@ -1290,7 +1290,7 @@ def save(argc,argv,hp):
 		return
 	if saveType == 'struct':
 		try:
-			fp = open(fileName,'w')
+			fp = open(fileName,'wb')
 			pickle.dump(hp.ENUM_HOSTS,fp)
 			fp.close()
 			print("Host data saved to '%s'" % fileName)
@@ -1316,7 +1316,7 @@ def load(argc,argv,hp):
 		loadFile = argv[1]
 	
 		try:
-			fp = open(loadFile,'r')
+			fp = open(loadFile,'rb')
 			hp.ENUM_HOSTS = {}
 			hp.ENUM_HOSTS = pickle.load(fp)
 			fp.close()
