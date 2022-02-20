@@ -248,11 +248,11 @@ class upnp:
 		delimiter = "%s:" % header
 		defaultRet = False
 
-		lowerDelim = delimiter.lower().encode()
+		lowerDelim = delimiter.lower()
 		dataArray = data.split(b"\r\n")
 	
 		#Loop through each line of the headers
-		for line in dataArray:
+		for line in map(bytes.decode, dataArray):
 			lowerLine = line.lower()
 			#Does this line start with the header we're looking for?
 			if lowerLine.startswith(lowerDelim):
