@@ -7,4 +7,5 @@ UPnP command line tool.
 
 ```bash
 python3 -m pip install git+https://github.com/JamesTheAwesomeDude/miranda-upnp.git@stable
+miranda -h
 ```
