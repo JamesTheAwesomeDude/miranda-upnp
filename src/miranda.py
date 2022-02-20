@@ -248,8 +248,8 @@ class upnp:
 		delimiter = "%s:" % header
 		defaultRet = False
 
-		lowerDelim = delimiter.lower()
-		dataArray = data.split("\r\n")
+		lowerDelim = delimiter.lower().encode()
+		dataArray = data.split(b"\r\n")
 	
 		#Loop through each line of the headers
 		for line in dataArray:
@@ -299,7 +299,7 @@ class upnp:
 
 		#Is the SSDP packet a notification, a reply, or neither?
 		for text,messageType in knownHeaders.items():
-			if data.upper().startswith(text):
+			if data.decode().upper().startswith(text):
 				break
 			else:
 				messageType = False
@@ -315,7 +315,7 @@ class upnp:
 			if xmlFile == False or host == False or page == False:
 				print('ERROR parsing recieved header:')
 				print(self.STARS)
-				print(data)
+				print(data.decode())
 				print(self.STARS)
 				print('')
 				return False
@@ -448,7 +448,7 @@ class upnp:
 				print(self.STARS)
 				print('')
 
-			sock.send(soapRequest)
+			sock.send(soapRequest.encode())
 			while True:
 				data = sock.recv(self.MAX_RECV)
 				if not data:
@@ -459,9 +459,9 @@ class upnp:
 						break
 			sock.close()
 	
-			(header,body) = soapResponse.split('\r\n\r\n',1)
-			if not header.upper().startswith('HTTP/1.') and ' 200 ' in header.split('\r\n')[0]:
-				print('SOAP request failed with error code:',header.split('\r\n')[0].split(' ',1)[1])
+			(header,body) = soapResponse.split(b'\r\n\r\n',1)
+			if not header.decode().upper().startswith('HTTP/1.') and ' 200 ' in header.split(b'\r\n')[0].decode():
+				print('SOAP request failed with error code:',header.split(b'\r\n')[0].split(' ',1)[1])
 				errorMsg = self.extractSingleTag(body,'errorDescription')
 				if errorMsg:
 					print('SOAP error message:',errorMsg)
@@ -854,7 +854,7 @@ def msearch(argc,argv,hp):
 			"ST:%s\r\n" % (hp.ip,hp.port,st)
 	for header,value in hp.msearchHeaders.items():
 			request += header + ':' + value + "\r\n"	
-	request += "\r\n" 
+	request += "\r\n"
 
 	print("Entering discovery mode for '%s', Ctl+C to stop..." % st)
 	print('')
@@ -865,7 +865,7 @@ def msearch(argc,argv,hp):
 		print('Failed to bind port %i' % lport)
 		return
 
-	hp.send(request,server)
+	hp.send(request.encode(),server)
 	count = 0
 	start = time.time()
 
@@ -877,7 +877,7 @@ def msearch(argc,argv,hp):
 			if hp.TIMEOUT > 0 and (time.time() - start) > hp.TIMEOUT:
 				raise Exception("Timeout exceeded")
 
-			if hp.parseSSDPInfo(hp.recv(1024,server),False,False):
+			if hp.parseSSDPInfo(hp.recv(1024,server),showUniq=False,verbose=False):
 				count += 1
 
 		except Exception as e:
@@ -900,7 +900,7 @@ def pcap(argc,argv,hp):
 			if hp.TIMEOUT > 0 and (time.time() - start) > hp.TIMEOUT:
 				raise Exception ("Timeout exceeded")
 
-			if hp.parseSSDPInfo(hp.recv(1024,False),False,False):
+			if hp.parseSSDPInfo(hp.recv(1024,False),showUniq=False,verbose=False):
 				count += 1
 
 		except Exception as e:
